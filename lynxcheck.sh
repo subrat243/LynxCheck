@@ -56,3 +56,18 @@ check_root() {
         echo
     fi
 }
+
+# --------------------------------------------------
+# System Information
+# --------------------------------------------------
+
+system_info() {
+    section "SYSTEM INFORMATION"
+
+    info "Hostname : $(hostname)"
+    info "OS       : $(grep '^PRETTY_NAME=' /etc/os-release | cut -d= -f2- | tr -d '"')"
+    info "Kernel   : $(uname -r)"
+    info "Arch     : $(uname -m)"
+    info "Uptime   : $(uptime -p)"
+}
+
