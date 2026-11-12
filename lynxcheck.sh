@@ -71,3 +71,36 @@ system_info() {
     info "Uptime   : $(uptime -p)"
 }
 
+# --------------------------------------------------
+# User Audit
+# --------------------------------------------------
+
+user_audit() {
+    section "USER AUDIT"
+
+    local uid0_users
+    uid0_users=$(awk -F: '$3 == 0 {print $1}' /etc/passwd)
+
+    if [[ "$uid0_users" == "root" ]]; then
+        pass "Only root has UID 0."
+    else
+        fail "Additional UID 0 accounts found:"
+        echo "$uid0_users"
+    fi
+
+    local empty_passwords
+    empty_passwords=$(awk -F: '$2 == "" {print $1}' /etc/shadow 2>/dev/null)
+
+    if [[ -z "$empty_passwords" ]]; then
+        pass "No accounts with empty passwords detected."
+    else
+        fail "Accounts with empty passwords:"
+        echo "$empty_passwords"
+    fi
+
+    local login_users
+    login_users=$(awk -F: '$7 !~ /(nologin|false)$/ {print $1}' /etc/passwd)
+
+    info "Accounts with interactive shells:"
+    echo "$login_users"
+}
